@@ -114,7 +114,14 @@
 
   </main>  <footer>© 2026 Orbixa · Connect your world</footer> 
   </script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> <script>
-     async function createPost() {
+const SUPABASE_URL = 'https://elijuknvmfxjwzulhoxk.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_iBuj_YtEdJl3Ko72EYkMVQ_wHRtD4jQ';
+
+const supabaseClient = window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+    async function createPost() {
 const name = document.getElementById('username').value.trim() || 'Orbixa Member';
 const caption = document.getElementById('caption').value.trim();
 const file = document.getElementById('photo').files[0];
