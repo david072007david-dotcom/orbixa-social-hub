@@ -112,55 +112,113 @@
   <button onclick="alert('Premium payments are not connected yet.')">Explore Premium</button>
 </section>
 
-  </main>  <footer>© 2026 Orbixa · Connect your world</footer>  <script>
-    function createPost() {
-      const name = document.getElementById('username').value.trim() || 'Orbixa Member';
-      const caption = document.getElementById('caption').value.trim();
-      const file = document.getElementById('photo').files[0];
+  </main>  <footer>© 2026 Orbixa · Connect your world</footer> 
+  </script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> <script>
+     async function createPost() {
+const name = document.getElementById('username').value.trim() || 'Orbixa Member';
+const caption = document.getElementById('caption').value.trim();
+const file = document.getElementById('photo').files[0];
 
-      if (!caption && !file) {
-        alert('Please write something or choose a photo.');
-        return;
-      }
+if (!caption && !file) {
+alert('Please write something or choose a photo.');
+return;
+}
 
-      const card = document.createElement('article');
-      card.className = 'card';
+let imageUrl = null;
 
-      const title = document.createElement('h3');
-      title.textContent = name;
-      card.appendChild(title);
+if (file) {
+const fileName = Date.now() + '-' + file.name.replace(/[^a-zA-Z0-9.-]/g, '');
 
-      if (caption) {
-        const text = document.createElement('p');
-        text.textContent = caption;
-        card.appendChild(text);
-      }
+const { error: uploadError } = await supabaseClient.storage
+  .from('orbixa-posts')
+  .upload(fileName, file, { contentType: file.type });
 
-      if (file) {
-        const img = document.createElement('img');
-        img.className = 'post-image';
-        img.alt = 'Post image';
-        img.src = URL.createObjectURL(file);
-        card.appendChild(img);
-      }
+if (uploadError) {
+  alert('Image upload failed: ' + uploadError.message);
+  return;
+}
 
-      const like = document.createElement('button');
-      like.textContent = '♡ Like 0';
-      let count = 0;
-      like.onclick = function() {
-        count++;
-        like.textContent = '♥ Like ' + count;
-      };
-      card.appendChild(like);
+const { data: publicData } = supabaseClient.storage
+  .from('orbixa-posts')
+  .getPublicUrl(fileName);
 
-      document.getElementById('feed').prepend(card);
-      document.getElementById('profileName').textContent = 'Display name: ' + name;
-      document.getElementById('caption').value = '';
-      document.getElementById('photo').value = '';
+imageUrl = publicData.publicUrl;
+
+}
+
+const { data: post, error } = await supabaseClient
+.from('posts')
+.insert([{
+username: name,
+caption: caption,
+image_url: imageUrl,
+likes_count: 0
+}])
+.select()
+.single();
+
+if (error) {
+alert('Post save failed: ' + error.message);
+return;
+}
+
+renderPost(post);
+
+document.getElementById('profileName').textContent = 'Display name: ' + name;
+document.getElementById('caption').value = '';
+document.getElementById('photo').value = '';
     }
+|function renderPost(post) {
+const card = document.createElement('article');
+card.className = 'card';
 
+const title = document.createElement('h3');
+title.textContent = post.username || 'Orbixa Member';
+card.appendChild(title);
+
+if (post.caption) {
+const text = document.createElement('p');
+text.textContent = post.caption;
+card.appendChild(text);
+}
+
+if (post.image_url) {
+const img = document.createElement('img');
+img.className = 'post-image';
+img.alt = 'Post image';
+img.src = post.image_url;
+card.appendChild(img);
+}
+
+const like = document.createElement('button');
+let count = post.likes_count || 0;
+like.textContent = '♡ Like ' + count;
+
+like.onclick = function () {
+count++;
+like.textContent = '♥ Like ' + count;
+};
+
+card.appendChild(like);
+document.getElementById('feed').prepend(card);
+}
+    |async function loadPosts() {
+const { data, error } = await supabaseClient
+.from('posts')
+.select('*')
+.order('created_at', { ascending: false });
+
+if (error) {
+console.error('Could not load posts:', error.message);
+return;
+}
+
+document.getElementById('feed').innerHTML = '';
+[...data].reverse().forEach(post => renderPost(post));
+}
     function showProfile() {
       document.getElementById('profile').scrollIntoView({ behavior: 'smooth' });
     }
-  </script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>|</body>
+    loadPosts();
+  </body>
   </html>
