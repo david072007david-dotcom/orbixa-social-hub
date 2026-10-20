@@ -585,7 +585,7 @@ async function loadPosts() {
 
   try {
     const { data, error } = await db
-      .from("posts")
+      .from("Posts")
       .select("*")
       .order("created_at", { ascending:false })
       .limit(50);
