@@ -645,8 +645,8 @@ async function createPost() {
       const { error: uploadError } = await db.storage
         .from("orbixa-posts")
         .upload(path, file, { contentType:file.type, upsert:false });
-
-      if (uploadError) throw uploadError;
+      if (uploadError) throw 
+      uploadError;
 
       const { data: publicData } = db.storage
         .from("orbixa-posts")
