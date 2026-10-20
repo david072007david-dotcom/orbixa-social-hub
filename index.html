@@ -670,8 +670,8 @@ async function createPost() {
     showPage("home");
     await loadPosts();
   } catch (error) {
-    console.error(error);
-    toast("Post failed. Check Supabase connection and permissions.");
+  console.error("ORBIXA POST ERROR:", error);
+  toast("Post error: " + (error.message || JSON.stringify(error)));
   } finally {
     button.disabled = false;
     button.textContent = "Share Post ✦";
