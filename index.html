@@ -662,7 +662,10 @@ async function createPost() {
       likes_count:0
     }]);
 
-    if (error) throw error;
+    if (uploadError) {
+  console.error("ORBIXA STORAGE ERROR:", uploadError);
+  throw uploadError;
+    }
 
     $("postCaption").value = "";
     $("postPhoto").value = "";
