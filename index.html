@@ -655,7 +655,7 @@ async function createPost() {
       imageUrl = publicData.publicUrl;
     }
 
-    const { error } = await db.from("posts").insert([{
+    const { error } = await db.from("Posts").insert([{
       username,
       caption,
       image_url:imageUrl,
