@@ -662,11 +662,8 @@ async function createPost() {
       likes_count:0
     }]);
 
-    if (uploadError) {
-  console.error("ORBIXA STORAGE ERROR:", uploadError);
-  throw uploadError;
-    }
-
+  }
+  
     $("postCaption").value = "";
     $("postPhoto").value = "";
     toast("Your post was shared! ✨");
