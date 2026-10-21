@@ -604,7 +604,6 @@ async function loadPosts() {
     console.error(error);
     feed.innerHTML = '<div class="empty">Could not load posts. Check your Supabase table and permissions.</div>';
   }
-}
 
 async function createPost() {
   if (!db) {
@@ -645,8 +644,7 @@ async function createPost() {
       const { error: uploadError } = await db.storage
         .from("orbixa-posts")
         .upload(path, file, { contentType:file.type, upsert:false });
-      if (uploadError) throw 
-      uploadError;
+    if (uploadError) throw uploadError;
 
       const { data: publicData } = db.storage
         .from("orbixa-posts")
@@ -661,9 +659,8 @@ async function createPost() {
       image_url:imageUrl,
       likes_count:0
     }]);
-
-  }
-  
+if (error) throw error;
+    
     $("postCaption").value = "";
     $("postPhoto").value = "";
     toast("Your post was shared! ✨");
