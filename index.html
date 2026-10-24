@@ -1,468 +1,103 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#090914">
+<meta name="theme-color" content="#100d1b">
 <title>Orbixa — Connect Your World</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#090914;--card:#151526;--card2:#202039;--text:#fff;--muted:#aaaac5;--purple:#8b5cf6;--pink:#ec4899;--line:#30304a}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif;padding-bottom:85px}
-button,input,textarea{font:inherit}
-button{cursor:pointer}
-button:disabled{opacity:.5}
-.topbar{position:sticky;top:0;z-index:20;background:#090914f5;border-bottom:1px solid var(--line);padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
-.logo{font-size:25px;font-weight:900;letter-spacing:-1px;background:linear-gradient(90deg,#a78bfa,#f472b6);color:transparent;background-clip:text}
-.page{display:none;padding:16px}
-.page.active{display:block}
-h1,h2,h3,p{margin-top:0}
-h2{font-size:21px}
-.small{font-size:13px;color:var(--muted);line-height:1.5}
-.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:15px}
-.primary{border:0;color:white;font-weight:bold;background:linear-gradient(110deg,var(--purple),var(--pink));padding:12px 16px;border-radius:13px}
-.secondary,.icon-btn{border:1px solid var(--line);color:white;background:var(--card2);padding:10px 13px;border-radius:12px}
-input,textarea{width:100%;background:#0e0e1d;color:white;border:1px solid var(--line);padding:13px;border-radius:12px;margin:7px 0 12px}
-textarea{min-height:85px;resize:vertical}
-.row{display:flex;gap:9px;align-items:center}
-.row>*{min-width:0}
-.spread{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.stories,.notes{display:flex;gap:13px;overflow-x:auto;padding:8px 0 17px}
-.story{flex:0 0 66px;text-align:center;font-size:12px;color:var(--muted);cursor:pointer}
-.ring{width:62px;height:62px;border-radius:50%;padding:3px;margin:0 auto 7px;background:linear-gradient(135deg,#8b5cf6,#ec4899,#f59e0b)}
-.inner{width:100%;height:100%;border-radius:50%;display:grid;place-items:center;background:var(--card2);border:3px solid var(--bg);font-size:22px}
-.avatar{width:42px;height:42px;flex-shrink:0;display:grid;place-items:center;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#ec4899);font-weight:bold}
-.post-head{display:flex;align-items:center;gap:10px;margin-bottom:13px}
-.post-image{width:100%;max-height:440px;object-fit:contain;background:#080810;border-radius:13px;margin:5px 0 12px}
-.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-.actions button{background:var(--card2);border:0;color:white;border-radius:10px;padding:9px 11px}
-.nav{position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;justify-content:space-around;background:#10101ff5;border-top:1px solid var(--line);padding:9px 2px calc(9px + env(safe-area-inset-bottom))}
-.nav button{border:0;background:none;color:var(--muted);font-size:10px;display:flex;flex-direction:column;align-items:center;gap:4px;flex:1}
-.nav button span{font-size:20px}
-.nav button.active{color:#c4b5fd}
-.empty{text-align:center;color:var(--muted);padding:25px 10px}
-.badge{display:inline-block;background:#3b245f;color:#d8b4fe;padding:5px 9px;border-radius:20px;font-size:11px}
-.note{min-width:115px;background:#282044;border:1px solid #514078;border-radius:16px;padding:13px;font-size:12px;flex-shrink:0}
-.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
-.grid-item{aspect-ratio:1;background:var(--card2);border-radius:7px;overflow:hidden;display:grid;place-items:center}
-.grid-item img{width:100%;height:100%;object-fit:cover}
-#toast{position:fixed;z-index:100;bottom:90px;left:16px;right:16px;background:#29243e;border:1px solid #514078;padding:13px;border-radius:12px;text-align:center}
-.hidden{display:none!important}
-@media(min-width:650px){body{max-width:650px;margin:auto}.topbar{max-width:650px}.nav{left:50%;transform:translateX(-50%);width:100%;max-width:650px}}
+:root{--bg:#100d1b;--panel:#1a1628;--panel2:#241d35;--text:#f7f3ff;--muted:#aaa0bf;--line:#332a49;--pink:#f35dbb;--purple:#9b70ff;--good:#70e0b0}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 15% -10%,#352052 0,transparent 35%),var(--bg);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer;border:0;color:white;background:linear-gradient(120deg,var(--purple),var(--pink));border-radius:13px;padding:11px 14px;font-weight:700}button.secondary{background:var(--panel2);border:1px solid var(--line)}button.ghost{background:transparent;border:1px solid var(--line)}button:disabled{opacity:.5;cursor:not-allowed}input,textarea,select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:#100d1b;color:var(--text);outline:none}textarea{resize:vertical;min-height:80px}label{display:block;color:var(--muted);font-size:13px;margin:10px 0 6px}.app{max-width:700px;margin:auto;min-height:100vh;padding-bottom:84px}.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#100d1beF;border-bottom:1px solid var(--line);backdrop-filter:blur(16px)}.brand{font-size:22px;font-weight:900;letter-spacing:-.6px;background:linear-gradient(90deg,#fff,var(--pink),var(--purple));color:transparent;background-clip:text}.top-actions{display:flex;gap:8px}.iconbtn{width:42px;height:42px;padding:0;border-radius:14px;font-size:20px}.content{padding:14px}.page{display:none}.page.active{display:block}.card{background:linear-gradient(145deg,#1d172c,#151120);border:1px solid var(--line);border-radius:20px;padding:15px;margin-bottom:14px;box-shadow:0 12px 35px #0002}.muted{color:var(--muted)}.row{display:flex;gap:10px;align-items:center}.between{display:flex;justify-content:space-between;align-items:center;gap:10px}.avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,var(--purple),var(--pink));display:grid;place-items:center;font-weight:900;flex-shrink:0}.stories{display:flex;gap:12px;overflow:auto;padding:4px 0 15px}.story-item{min-width:72px;text-align:center;font-size:12px;color:var(--muted)}.story-ring{width:64px;height:64px;border-radius:50%;padding:3px;background:linear-gradient(135deg,var(--pink),#ffbd68,var(--purple));margin:0 auto 5px}.story-ring button,.story-ring img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:2px solid var(--bg)}.story-ring button{padding:0;font-size:27px}.post-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}.post-media{width:100%;max-height:520px;object-fit:contain;border-radius:14px;background:#08070d;margin-top:12px}.post-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.post-actions button{padding:8px 12px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.grid img,.grid video{width:100%;aspect-ratio:1;object-fit:cover;border-radius:9px;background:var(--panel2)}.bottom{position:fixed;z-index:10;bottom:0;left:0;right:0;display:flex;justify-content:center;background:#100d1bf2;border-top:1px solid var(--line);backdrop-filter:blur(16px);padding:8px 4px calc(8px + env(safe-area-inset-bottom))}.nav{width:min(700px,100%);display:flex;justify-content:space-around;gap:3px}.nav button{flex:1;min-width:0;padding:8px 2px;background:transparent;border:0;color:var(--muted);font-size:11px}.nav button span{display:block;font-size:21px;margin-bottom:2px}.nav button.active{color:#fff;background:#2b2141;border-radius:13px}.nav button.active span{color:var(--pink)}.hidden{display:none!important}.notice{padding:10px 12px;border-radius:12px;background:#302342;color:#f4dfff;margin-bottom:12px;font-size:13px}.auth{max-width:440px;margin:8vh auto;padding:22px}.auth h1{font-size:32px;margin:0}.auth p{color:var(--muted)}.pill{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:5px 9px;font-size:12px;color:var(--muted)}.profile-top{display:flex;gap:15px;align-items:center}.profile-avatar{width:84px;height:84px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,var(--purple),var(--pink));padding:3px}.stats{display:flex;gap:22px;margin-top:12px}.stats b{display:block;font-size:18px}.menu-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.menu-grid button{min-height:78px;text-align:left;background:var(--panel2);border:1px solid var(--line)}.menu-grid button b{display:block;font-size:16px}.modal-back{position:fixed;inset:0;z-index:20;background:#05030bdc;display:none;align-items:flex-end;justify-content:center}.modal-back.open{display:flex}.modal{width:min(700px,100%);max-height:92vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:24px 24px 0 0;padding:18px 16px calc(22px + env(safe-area-inset-bottom))}.modal h2{margin:0 0 12px}.modal-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.editor-preview{width:100%;max-height:42vh;object-fit:contain;border-radius:14px;background:#08070d;margin-top:10px}.small{font-size:12px}.status{font-size:13px;color:var(--muted);min-height:18px;margin-top:8px}.story-view{min-height:60vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;border-radius:18px;padding:24px;background:linear-gradient(135deg,#311a4f,#11101c,#5c2252)}.story-view img,.story-view video{max-width:100%;max-height:55vh;border-radius:12px}.divider{height:1px;background:var(--line);margin:14px 0}a{color:#d5bfff}@media(min-width:600px){.content{padding:20px}.bottom{padding-bottom:10px}.modal-back{align-items:center}.modal{border-radius:24px}}
 </style>
 </head>
 <body>
-<header class="topbar">
-  <div class="logo">Orbixa ✦</div>
-  <button class="icon-btn" onclick="showPage('notifications')">♧ Alerts</button>
-</header>
-
-<main>
+<div id="authScreen" class="auth">
+  <div class="brand">ORBIXA ✦</div><h1>Connect Your World.</h1>
+  <p>Create your account and meet your world.</p>
+  <div class="card">
+    <div class="notice">Email/password sign-in is enabled for this first version. Email verification depends on your Supabase Auth settings.</div>
+    <label for="authEmail">Email</label><input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com">
+    <label for="authPassword">Password</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="At least 6 characters">
+    <label for="authUsername">Username (for new accounts)</label><input id="authUsername" maxlength="24" placeholder="your_username">
+    <div class="row" style="margin-top:14px"><button id="signInBtn" style="flex:1">Sign in</button><button id="signUpBtn" class="secondary" style="flex:1">Create account</button></div>
+    <button id="resetBtn" class="ghost" style="width:100%;margin-top:9px">Forgot password?</button><div id="authStatus" class="status"></div>
+  </div>
+  <p class="small">Use an email you control. Never share your password with anyone.</p>
+</div>
+<div id="app" class="app hidden">
+<header class="top"><div class="brand">ORBIXA ✦</div><div class="top-actions"><button class="iconbtn secondary" id="homeCreate" aria-label="Create">＋</button><button class="iconbtn secondary" id="topAlerts" aria-label="Alerts">♧</button></div></header>
+<main class="content">
 <section id="homePage" class="page active">
-  <div class="spread">
-    <div><h2 style="margin-bottom:4px">Your world. Your people.</h2><p class="small">Share your moments with Orbixa.</p></div>
-    <button class="primary" onclick="showPage('create')">＋ Post</button>
-  </div>
-  <div class="spread"><h3>Stories</h3><span class="small">Your circle</span></div>
-  <div class="stories">
-    <div class="story" onclick="showPage('create')"><div class="ring"><div class="inner">＋</div></div>Your story</div>
-    <div class="story" onclick="showStory('✨ Welcome to Orbixa!')"><div class="ring"><div class="inner">🌟</div></div>Orbixa</div>
-    <div class="story" onclick="showStory('🌍 Connect with your world.')"><div class="ring"><div class="inner">🌍</div></div>Discover</div>
-    <div class="story" onclick="showStory('💜 Share your moments.')"><div class="ring"><div class="inner">💜</div></div>Moments</div>
-  </div>
-  <div class="spread"><h3>Your Feed</h3><button class="secondary" onclick="loadPosts()">↻ Refresh</button></div>
-  <div id="feed"><div class="empty">Connecting to Orbixa...</div></div>
+  <div class="between"><h2 style="margin:4px 0 12px">Your world. Your people.</h2><span class="pill">Connect worldwide</span></div>
+  <div class="stories" id="storiesRow"></div>
+  <div class="card"><div class="between"><div><b>Share a moment</b><div class="muted small">Photo, video, reel or story</div></div><button id="homeCreate2">＋ Create</button></div></div>
+  <div id="feed"></div>
 </section>
-
-<section id="createPage" class="page">
-  <h2>Create a post ✨</h2>
-  <div class="card">
-    <label class="small">Username</label><input id="postUsername" placeholder="Enter your username" maxlength="30">
-    <label class="small">Caption</label><textarea id="postCaption" placeholder="What's happening?"></textarea>
-    <label class="small">Photo (optional)</label><input id="postPhoto" type="file" accept="image/jpeg,image/png,image/webp">
-    <p class="small">Image maximum: 5 MB.</p>
-    <button id="publishBtn" class="primary" style="width:100%" onclick="createPost()">Share Post ✦</button>
-  </div>
+<section id="explorePage" class="page">
+  <h2>Explore</h2><input id="searchInput" placeholder="Search usernames or captions"><div style="height:10px"></div><button id="searchBtn">Search</button><div id="searchResults" style="margin-top:14px"></div>
 </section>
-
-<section id="searchPage" class="page">
-  <h2>Explore 🔍</h2>
-  <input id="searchInput" placeholder="Search usernames or captions..." oninput="searchPosts()">
-  <div id="searchResults"><div class="empty">Search posts from the Orbixa community.</div></div>
-</section>
-
-<section id="reelsPage" class="page">
-  <h2>Reels 🎬</h2>
-  <div id="reelFeed"><div class="empty">Photo posts appear here until video hosting is configured.</div></div>
-  <div class="card"><h3>Create a Reel</h3><p class="small">Video upload needs a separate video-storage setup.</p><button class="primary" onclick="toast('Video upload is not connected yet.')">＋ Create Reel</button></div>
-</section>
-
-<section id="messagesPage" class="page">
-  <h2>Messages ✉️</h2>
-  <h3>Notes</h3>
-  <div class="notes">
-    <div class="note" onclick="makeNote()">＋ Your note<br><br>Share a thought...</div>
-    <div class="note">💜<br><br>Make today count.</div>
-    <div class="note">🌟<br><br>Good vibes only.</div>
-  </div>
-  <h3>Your Chats</h3>
-  <div class="card"><div class="post-head"><div class="avatar">O</div><div><b>Orbixa Community</b><div class="small">Private messages are not connected yet.</div></div></div><button class="primary" style="width:100%" onclick="showPage('account')">Sign in / Create account</button></div>
-  <div class="card"><h3>📞 Voice & Video Calls</h3><p class="small">Calling requires WebRTC, call signalling and authenticated accounts.</p><div class="row"><button class="secondary" style="flex:1" onclick="toast('Voice calls are not connected yet.')">📞 Voice</button><button class="secondary" style="flex:1" onclick="toast('Video calls are not connected yet.')">🎥 Video</button></div></div>
-</section>
-
-<section id="accountPage" class="page">
-  <h2>Your Orbixa Account 👤</h2>
-  <div class="card">
-    <label class="small">Email</label><input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com">
-    <label class="small">Password</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="At least 6 characters">
-    <button class="primary" style="width:100%;margin-bottom:10px" onclick="signIn()">Sign In</button>
-    <button class="secondary" style="width:100%" onclick="signUp()">Create Account</button>
-    <p id="authStatus" class="small" style="margin-top:12px"></p>
-    <button class="secondary" onclick="signOut()">Sign Out</button>
-  </div>
-</section>
-
+<section id="reelsPage" class="page"><h2>Reels</h2><p class="muted">Public video posts appear here. Dedicated vertical reel editor and recommendations need further backend work.</p><div id="reelsFeed"></div></section>
+<section id="messagesPage" class="page"><h2>Messages</h2><div class="card"><b>Notes</b><p class="muted">Notes and private chat will be connected after a secure messages table and realtime policies are configured.</p><input id="noteText" maxlength="60" placeholder="Write a short note (preview only)"><button id="saveNote" style="margin-top:8px">Save note preview</button><div id="noteStatus" class="status"></div></div><div class="card"><b>Orbixa Community</b><p class="muted">Real private messaging and voice/video calls are not active in this first file yet.</p></div></section>
+<section id="premiumPage" class="page"><div class="card"><span class="pill">ORBIXA PLUS</span><h1>Premium ✦</h1><h2>₹99 / month</h2><p class="muted">Fewer ads and creator subscription features are planned. No payment is collected by this preview.</p><button disabled>Payments coming later</button></div></section>
 <section id="profilePage" class="page">
-  <h2>My Profile</h2>
-  <div class="card">
-    <div class="row"><div class="avatar" style="width:65px;height:65px;font-size:25px">O</div><div><h3 id="profileName">Orbixa Member</h3><span class="badge">✦ Orbixa</span></div></div>
-    <p class="small" style="margin-top:15px">Your space. Your story. Your world.</p>
-    <div class="row"><div style="flex:1;text-align:center"><b id="postCount">0</b><div class="small">Posts loaded</div></div><div style="flex:1;text-align:center"><b>—</b><div class="small">Followers</div></div><div style="flex:1;text-align:center"><b>—</b><div class="small">Following</div></div></div>
-    <button class="secondary" style="width:100%;margin-top:15px" onclick="showPage('account')">Account / Sign in</button>
-  </div>
-  <h3>My Posts</h3><div id="profilePosts" class="grid"></div>
+  <div class="between"><h2 style="margin:4px 0 14px">Your Profile</h2><div class="row"><button class="iconbtn secondary" id="profileAlerts" aria-label="Alerts">♧</button><button class="iconbtn secondary" id="settingsBtn" aria-label="Settings">⚙</button></div></div>
+  <div class="card"><div class="profile-top"><div id="profileAvatar" class="avatar profile-avatar">O</div><div style="flex:1;min-width:0"><h2 id="profileName" style="margin:0">Orbixa User</h2><div id="profileHandle" class="muted">@user</div><div class="stats"><div><b id="profilePostCount">0</b><span class="muted small">Posts</span></div><div><b>—</b><span class="muted small">Followers</span></div><div><b>—</b><span class="muted small">Following</span></div></div></div></div><p id="profileBio" class="muted">Your world, your story.</p><div class="row"><button id="editProfileBtn" class="secondary" style="flex:1">Edit profile</button><button id="profileCreate" style="flex:1">＋ Create</button></div></div>
+  <div class="card"><div class="between"><b>Highlights</b><button class="secondary" id="newHighlight">＋ New</button></div><div id="highlightsRow" class="stories" style="margin-top:10px"><div class="muted small">Save stories as highlights when story storage is configured.</div></div></div>
+  <h3>Your posts</h3><div id="profileGrid" class="grid"></div>
+  <div class="card"><div class="between"><b>Account & Settings</b><button class="secondary" id="logoutBtn">Log out</button></div><div class="menu-grid" style="margin-top:12px"><button id="settingsPrivacy"><b>🔒 Privacy</b><span class="small muted">Account controls</span></button><button id="settingsLanguage"><b>🌐 Language</b><span class="small muted">Feed preferences</span></button><button id="settingsNotifications"><b>🔔 Notifications</b><span class="small muted">Alerts preferences</span></button><button id="settingsAppearance"><b>🎨 Appearance</b><span class="small muted">Theme options</span></button><button id="settingsHelp"><b>❓ Help</b><span class="small muted">Support information</span></button><button id="settingsAbout"><b>ℹ️ About Orbixa</b><span class="small muted">Version 1.0 preview</span></button></div></div>
 </section>
-
-<section id="premiumPage" class="page">
-  <div class="card" style="text-align:center;padding:25px 18px">
-    <span class="badge">ORBIXA PREMIUM</span><h1 style="font-size:32px;margin:18px 0 8px">Your world, upgraded.</h1>
-    <p class="small">More ways to express yourself.</p><div style="font-size:39px;font-weight:900;margin:22px 0">₹99<span class="small"> / month</span></div>
-    <p>✦ Premium profile badge</p><p>✦ Extra profile customisation</p><p>✦ Personalisation options</p>
-    <p class="small">Checkout is not connected. No payment will be collected.</p><button class="primary" style="width:100%" onclick="toast('Secure payment and subscription verification are required.')">Explore Premium</button>
-  </div>
-</section>
-
-<section id="notificationsPage" class="page">
-  <h2>Notifications 🔔</h2><div class="card"><p>✨ Welcome to Orbixa!</p><p class="small">Your social world starts here.</p></div>
-  <p class="small">Live likes, follows, messages and call alerts are not connected yet.</p>
-</section>
+<section id="alertsPage" class="page"><h2>Alerts</h2><div class="card"><p class="muted">Likes, comments, follows and message alerts will appear here once notification events are configured.</p></div></section>
+<section id="settingsPage" class="page"><div class="between"><h2>Settings</h2><button id="settingsBack" class="secondary">Back</button></div><div class="card"><b>Profile details</b><p class="muted">Edit your display name, username and bio.</p><button id="settingsEditProfile">Edit profile</button></div><div class="card"><b>Language preferences</b><p class="muted">Tamil/English feed preference UI is a preview; recommendation ranking is not implemented.</p><select id="languageSelect"><option>English</option><option>Tamil</option><option>Hindi</option><option>Other</option></select><button id="saveLanguage" style="margin-top:8px">Save preference</button></div><div class="card"><b>Security</b><p class="muted">Use password reset from the login screen. Keep your account email secure.</p><button id="settingsResetPassword" class="secondary">Send password reset email</button></div><div class="card"><b>Privacy & account</b><p class="muted">Private accounts, blocked-user lists and account deletion require their own secure database policies and are not enabled in this version.</p></div></section>
 </main>
-
-<nav class="nav">
-  <button class="active" data-page="home" onclick="showPage('home')"><span>⌂</span>Home</button>
-  <button data-page="search" onclick="showPage('search')"><span>⌕</span>Explore</button>
-  <button data-page="reels" onclick="showPage('reels')"><span>▷</span>Reels</button>
-  <button data-page="messages" onclick="showPage('messages')"><span>✉</span>Messages</button>
-  <button data-page="premium" onclick="showPage('premium')"><span>✧</span>Premium</button>
-  <button data-page="profile" onclick="showPage('profile')"><span>◉</span>Profile</button>
-</nav>
-<div id="toast" class="hidden" role="status"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<nav class="bottom"><div class="nav">
+<button class="active" data-page="homePage"><span>⌂</span>Home</button><button data-page="explorePage"><span>⌕</span>Explore</button><button data-page="reelsPage"><span>▷</span>Reels</button><button data-page="messagesPage"><span>✉</span>Messages</button><button data-page="premiumPage"><span>✦</span>Premium</button><button data-page="profilePage"><span>◉</span>Profile</button>
+</div></nav>
+</div>
+<div id="modalBack" class="modal-back"><div class="modal"><div class="between"><h2 id="modalTitle">Create</h2><button id="modalClose" class="iconbtn secondary" aria-label="Close">×</button></div><div id="modalBody"></div></div></div>
 <script>
-"use strict";
-
-/* Orbixa public browser configuration */
+(() => {
 const SUPABASE_URL = "https://elijuknvmfxjwzulhoxk.supabase.co";
 const SUPABASE_KEY = "sb_publishable_iBuj_YtEdJl3Ko72EYkMVQ_wHRtD4jQ";
-
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let currentUser = null, myProfile = null, posts = [], selectedMediaUrl = null, selectedMediaType = "image";
 const $ = id => document.getElementById(id);
-let db = null;
-let allPosts = [];
-let currentUser = null;
-let toastTimer = null;
-
-try {
-  if (window.supabase) {
-    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  }
-} catch (error) {
-  console.error("Supabase initialization failed:", error);
-}
-
-function toast(message) {
-  const box = $("toast");
-  box.textContent = String(message);
-  box.classList.remove("hidden");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => box.classList.add("hidden"), 3500);
-}
-
-function showPage(name) {
-  const target = $(name + "Page");
-  if (!target) {
-    toast("This page is not available.");
-    return;
-  }
-  document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
-  target.classList.add("active");
-  document.querySelectorAll(".nav button").forEach(button => {
-    button.classList.toggle("active", button.dataset.page === name);
-  });
-  window.scrollTo({top:0,behavior:"smooth"});
-  if (name === "home") loadPosts();
-  if (name === "profile") loadProfile();
-  if (name === "reels") renderReels();
-  if (name === "search") searchPosts();
-}
-
-function showStory(message) {
-  alert(message);
-}
-
-function safeText(value) {
-  return String(value ?? "").replace(/[&<>"']/g, char => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  })[char]);
-}
-
-function postCard(post) {
-  const username = safeText(post.username || "Orbixa Member");
-  const caption = safeText(post.caption || "");
-  const image = post.image_url
-    ? `<img class="post-image" src="${safeText(post.image_url)}" alt="Post image" loading="lazy">`
-    : "";
-  const id = safeText(post.id);
-  return `<article class="card">
-    <div class="post-head"><div class="avatar">${username.charAt(0).toUpperCase()}</div>
-    <div style="flex:1"><b>${username}</b><div class="small">Orbixa community</div></div><span class="small">✦</span></div>
-    ${image}${caption ? `<p style="white-space:pre-wrap;overflow-wrap:anywhere">${caption}</p>` : ""}
-    <div class="actions">
-      <button onclick="toast('Likes need a secure user-linked database table.')">♡ Like</button>
-      <button onclick="toast('Comments need a database table.')">💬 Comment</button>
-      <button onclick="sharePost('${id}')">↗ Share</button>
-    </div>
-  </article>`;
-}
-
-async function loadPosts() {
-  const feed = $("feed");
-  if (!db) {
-    feed.innerHTML = '<div class="empty">Supabase library unavailable. Check your internet connection and reload.</div>';
-    return;
-  }
-  feed.innerHTML = '<div class="empty">Loading posts...</div>';
-  try {
-    const {data,error} = await db.from("Posts").select("*").order("created_at",{ascending:false}).limit(50);
-    if (error) throw error;
-    allPosts = data || [];
-    feed.innerHTML = allPosts.length
-      ? allPosts.map(postCard).join("")
-      : '<div class="empty">No posts yet. Be the first to share a moment! ✨<br><br><button class="primary" onclick="showPage(\'create\')">Create Post</button></div>';
-    $("postCount").textContent = String(allPosts.length);
-    renderProfilePosts();
-    renderReels();
-    if ($("searchInput").value.trim()) searchPosts();
-  } catch (error) {
-    console.error("ORBIXA LOAD ERROR:",error);
-    feed.innerHTML = '<div class="empty">Could not load posts: ' + safeText(error.message || "Check table permissions.") + '</div>';
-  }
-}
-
-async function createPost() {
-  if (!db) return toast("Supabase connection is unavailable.");
-  const button = $("publishBtn");
-  const username = $("postUsername").value.trim() || (currentUser?.email?.split("@")[0]) || "Orbixa Member";
-  const caption = $("postCaption").value.trim();
-  const file = $("postPhoto").files[0];
-
-  if (!caption && !file) return toast("Write a caption or choose a photo first.");
-  if (file && file.size > 5 * 1024 * 1024) return toast("Choose an image smaller than 5 MB.");
-  if (file && !["image/jpeg","image/png","image/webp"].includes(file.type)) return toast("Choose JPG, PNG, or WebP.");
-
-  button.disabled = true;
-  button.textContent = "Sharing...";
-  try {
-    let imageUrl = null;
-    if (file) {
-      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
-      const path = Date.now() + "_" + Math.random().toString(36).slice(2) + "_" + safeName;
-      const {error:uploadError} = await db.storage.from("orbixa-posts").upload(
-        path,file,{contentType:file.type,upsert:false}
-      );
-      if (uploadError) throw uploadError;
-      const {data:publicData} = db.storage.from("orbixa-posts").getPublicUrl(path);
-      imageUrl = publicData.publicUrl;
-    }
-
-    const {error} = await db.from("Posts").insert([{
-      username,
-      caption,
-      image_url:imageUrl,
-      likes_count:0
-    }]);
-    if (error) throw error;
-
-    $("postUsername").value = username;
-    localStorage.setItem("orbixa_username",username);
-    $("postCaption").value = "";
-    $("postPhoto").value = "";
-    toast("Your post was shared! ✨");
-    showPage("home");
-    await loadPosts();
-  } catch (error) {
-    console.error("ORBIXA POST ERROR:",error);
-    toast("Post failed: " + (error.message || "Check Supabase permissions."));
-  } finally {
-    button.disabled = false;
-    button.textContent = "Share Post ✦";
-  }
-}
-
-function renderProfilePosts() {
-  const grid = $("profilePosts");
-  if (!grid) return;
-  const username = $("postUsername").value.trim() || currentUser?.email?.split("@")[0] || "";
-  const mine = allPosts.filter(post =>
-    username && String(post.username || "").toLowerCase() === username.toLowerCase()
-  );
-  grid.innerHTML = mine.length ? mine.map(post => post.image_url
-    ? `<div class="grid-item"><img src="${safeText(post.image_url)}" alt="My post" loading="lazy"></div>`
-    : '<div class="grid-item">✦</div>'
-  ).join("") : '<div class="small" style="grid-column:1/-1">Your posts appear here when their username matches yours.</div>';
-}
-
-function loadProfile() {
-  $("profileName").textContent = currentUser?.email?.split("@")[0] || $("postUsername").value.trim() || "Orbixa Member";
-  renderProfilePosts();
-}
-
-function searchPosts() {
-  const input = $("searchInput");
-  const result = $("searchResults");
-  if (!input || !result) return;
-  const query = input.value.trim().toLowerCase();
-  if (!query) {
-    result.innerHTML = '<div class="empty">Search Orbixa posts.</div>';
-    return;
-  }
-  const matches = allPosts.filter(post =>
-    String(post.username || "").toLowerCase().includes(query) ||
-    String(post.caption || "").toLowerCase().includes(query)
-  );
-  result.innerHTML = matches.length ? matches.map(postCard).join("") : '<div class="empty">No matching posts found.</div>';
-}
-
-function renderReels() {
-  const box = $("reelFeed");
-  if (!box) return;
-  const videos = allPosts.filter(post => /\.(mp4|webm|mov)(\?|$)/i.test(post.image_url || ""));
-  box.innerHTML = videos.length ? videos.map(post => `<div class="card"><video controls playsinline style="width:100%;max-height:70vh" src="${safeText(post.image_url)}"></video><p>${safeText(post.caption || "")}</p></div>`).join("") : '<div class="empty">No video reels yet. Video storage is not configured.</div>';
-}
-
-function makeNote() {
-  const note = prompt("Write your note (up to 60 characters):");
-  if (note === null) return;
-  if (!note.trim()) return toast("Write something first.");
-  if (note.trim().length > 60) return toast("Keep your note within 60 characters.");
-  try {
-    localStorage.setItem("orbixa_draft_note",note.trim());
-    toast("Note saved on this device only. Shared Notes are not connected yet.");
-  } catch (error) {
-    toast("Could not save this note.");
-  }
-}
-
-async function signUp() {
-  if (!db) return toast("Supabase connection unavailable.");
-  const email = $("authEmail").value.trim();
-  const password = $("authPassword").value;
-  if (!email || password.length < 6) {
-    $("authStatus").textContent = "Enter an email and a password with at least 6 characters.";
-    return;
-  }
-  $("authStatus").textContent = "Creating account...";
-  try {
-    const {data,error} = await db.auth.signUp({email,password});
-    if (error) throw error;
-    currentUser = data.user || null;
-    $("authStatus").textContent = "Account request submitted. Check your email if confirmation is required.";
-    loadProfile();
-  } catch (error) {
-    $("authStatus").textContent = error.message || "Could not create account.";
-  }
-}
-
-async function signIn() {
-  if (!db) return toast("Supabase connection unavailable.");
-  const email = $("authEmail").value.trim();
-  const password = $("authPassword").value;
-  if (!email || !password) {
-    $("authStatus").textContent = "Enter your email and password.";
-    return;
-  }
-  $("authStatus").textContent = "Signing in...";
-  try {
-    const {data,error} = await db.auth.signInWithPassword({email,password});
-    if (error) throw error;
-    currentUser = data.user;
-    $("authStatus").textContent = "Signed in successfully.";
-    $("profileName").textContent = currentUser.email.split("@")[0];
-    toast("Welcome to Orbixa!");
-    showPage("profile");
-  } catch (error) {
-    $("authStatus").textContent = error.message || "Sign-in failed.";
-  }
-}
-
-async function signOut() {
-  if (!db) return toast("Supabase connection unavailable.");
-  try {
-    const {error} = await db.auth.signOut();
-    if (error) throw error;
-    currentUser = null;
-    $("authStatus").textContent = "Signed out.";
-    loadProfile();
-    toast("Signed out.");
-  } catch (error) {
-    toast(error.message || "Sign-out failed.");
-  }
-}
-
-async function sharePost(id) {
-  const url = window.location.href.split("#")[0] + "#post-" + encodeURIComponent(id);
-  try {
-    if (navigator.share) await navigator.share({title:"Orbixa",text:"Check out this Orbixa post!",url});
-    else if (navigator.clipboard) {
-      await navigator.clipboard.writeText(url);
-      toast("Post link copied.");
-    } else toast("Copy the page link from your browser.");
-  } catch (error) {
-    if (error.name !== "AbortError") toast("Could not share this post.");
-  }
-}
-
-async function shareApp() {
-  try {
-    if (navigator.share) await navigator.share({title:"Orbixa",text:"Connect your world with Orbixa!",url:location.href});
-    else toast("Use your browser's share option to share Orbixa.");
-  } catch (error) {
-    if (error.name !== "AbortError") toast("Could not share Orbixa.");
-  }
-}
-
-async function initApp() {
-  try {
-    const savedName = localStorage.getItem("orbixa_username");
-    if (savedName) $("postUsername").value = savedName;
-  } catch (error) {}
-
-  if (!db) {
-    $("feed").innerHTML = '<div class="empty">Supabase could not initialize. Check your internet connection.</div>';
-    return;
-  }
-  try {
-    const {data,error} = await db.auth.getSession();
-    if (error) throw error;
-    currentUser = data.session?.user || null;
-  } catch (error) {
-    console.error("ORBIXA SESSION ERROR:",error);
-  }
-  loadProfile();
-  await loadPosts();
-}
-
-initApp();
+const escapeHtml = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function status(id, message, isError=false){const el=$(id);if(el){el.textContent=message;el.style.color=isError?"#ff9eaf":"var(--muted)";}}
+function toast(message){alert(message);}
+function showPage(id){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===id));if(id==="profilePage")renderProfile();if(id==="reelsPage")renderReels();window.scrollTo({top:0,behavior:"smooth"});}
+document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
+function openModal(title, html){$("modalTitle").textContent=title;$("modalBody").innerHTML=html;$("modalBack").classList.add("open");}
+function closeModal(){$("modalBack").classList.remove("open");$("modalBody").innerHTML="";selectedMediaUrl=null;}
+$("modalClose").onclick=closeModal;$("modalBack").addEventListener("click",e=>{if(e.target===$("modalBack"))closeModal();});
+async function authSignIn(){const email=$("authEmail").value.trim(),password=$("authPassword").value;if(!email||!password)return status("authStatus","Enter email and password.",true);status("authStatus","Signing in…");const {error}=await db.auth.signInWithPassword({email,password});status("authStatus",error?error.message:"Signed in.");if(error)status("authStatus",error.message,true);}
+async function authSignUp(){const email=$("authEmail").value.trim(),password=$("authPassword").value,username=$("authUsername").value.trim().replace(/^@/,"");if(!email||!password||!username)return status("authStatus","Enter email, password and username.",true);if(!/^[a-zA-Z0-9_.]{3,24}$/.test(username))return status("authStatus","Username must be 3–24 characters (letters, numbers, _ or .).",true);if(password.length<6)return status("authStatus","Use a password with at least 6 characters.",true);status("authStatus","Creating account…");const {data,error}=await db.auth.signUp({email,password,options:{data:{username,display_name:username}}});if(error)return status("authStatus",error.message,true);if(!data.session){status("authStatus","Account created. Check your email to verify, then sign in.");return;}status("authStatus","Account created.");}
+$("signInBtn").onclick=authSignIn;$("signUpBtn").onclick=authSignUp;
+$("resetBtn").onclick=async()=>{const email=$("authEmail").value.trim();if(!email)return status("authStatus","Enter your email first.",true);const {error}=await db.auth.resetPasswordForEmail(email);status("authStatus",error?error.message:"If the account exists, a password reset email has been sent.",!!error);};
+db.auth.onAuthStateChange((_event,session)=>{currentUser=session?.user||null;setTimeout(()=>{if(currentUser){$("authScreen").classList.add("hidden");$("app").classList.remove("hidden");startApp();}else{$("app").classList.add("hidden");$("authScreen").classList.remove("hidden");}},0);});
+async function startApp(){await loadProfile();await loadPosts();}
+async function loadProfile(){if(!currentUser)return;const {data,error}=await db.from("profiles").select("*").eq("id",currentUser.id).maybeSingle();if(!error&&data)myProfile=data;else{myProfile={id:currentUser.id,username:currentUser.user_metadata?.username||currentUser.email?.split("@")[0]||"user",display_name:currentUser.user_metadata?.display_name||currentUser.email?.split("@")[0]||"Orbixa User",bio:"",avatar_url:""};}renderProfile();}
+function myUsername(){return myProfile?.username||currentUser?.user_metadata?.username||currentUser?.email?.split("@")[0]||"user";}
+async function loadPosts(){const feed=$("feed");feed.innerHTML='<div class="card muted">Loading posts…</div>';const {data,error}=await db.from("Posts").select("id,created_at,username,caption,image_url,likes_count").order("created_at",{ascending:false}).limit(100);if(error){feed.innerHTML='<div class="card"><b>Could not load posts</b><p class="muted">'+escapeHtml(error.message)+'</p><p class="small muted">Check that public.\"Posts\" has a SELECT policy for public viewing.</p></div>';posts=[];return;}posts=data||[];renderFeed();renderProfile();}
+function postCard(p){const media=p.image_url?`<img class="post-media" src="${escapeHtml(p.image_url)}" alt="Post media" loading="lazy">`:"";return `<article class="card"><div class="post-head"><div class="avatar">${escapeHtml((p.username||"O").slice(0,1).toUpperCase())}</div><div><b>${escapeHtml(p.username||"Orbixa user")}</b><div class="muted small">${p.created_at?new Date(p.created_at).toLocaleString():""}</div></div></div>${p.caption?`<div>${escapeHtml(p.caption)}</div>`:""}${media}<div class="post-actions"><button class="secondary likeBtn" data-id="${escapeHtml(p.id)}">♡ ${Number(p.likes_count)||0}</button><button class="secondary" onclick="navigator.clipboard?.writeText(location.href).then(()=>alert('Link copied if supported'))">↗ Share</button></div></article>`;}
+function renderFeed(){ $("feed").innerHTML=posts.length?posts.map(postCard).join(""):'<div class="card"><h3>Your feed starts here ✨</h3><p class="muted">Be the first to share a moment on Orbixa.</p><button onclick="document.getElementById(\'homeCreate\').click()">＋ Create a post</button></div>';document.querySelectorAll(".likeBtn").forEach(b=>b.onclick=()=>toast("Likes need a dedicated likes table and secure policies; this preview does not save likes yet."));$("storiesRow").innerHTML=`<div class="story-item"><div class="story-ring"><button id="storyPlus" aria-label="Add story">＋</button></div>Your story</div>`+`<div class="story-item"><div class="story-ring"><button class="secondary" style="background:#241d35" onclick="alert('Stories from other users will appear when story storage is set up.')">✦</button></div>Discover</div>`; $("storyPlus").onclick=()=>openCreate("story");}
+function renderReels(){const videos=posts.filter(p=>p.image_url&&/\.(mp4|webm|mov)(\?|$)/i.test(p.image_url));$("reelsFeed").innerHTML=videos.length?videos.map(p=>`<div class="card"><b>${escapeHtml(p.username)}</b><p>${escapeHtml(p.caption||"")}</p><video class="post-media" src="${escapeHtml(p.image_url)}" controls playsinline></video></div>`).join(""):'<div class="card"><p class="muted">No video posts found yet. Video uploads and reels need a storage bucket that accepts video files.</p><button onclick="document.getElementById(\'homeCreate\').click()">＋ Create video</button></div>';}
+function renderProfile(){if(!currentUser)return;const name=myProfile?.display_name||myUsername();$("profileName").textContent=name;$("profileHandle").textContent="@"+myUsername();$("profileBio").textContent=myProfile?.bio||"Your world, your story.";const av=$("profileAvatar");if(myProfile?.avatar_url){av.outerHTML=`<img id="profileAvatar" class="profile-avatar" src="${escapeHtml(myProfile.avatar_url)}" alt="Profile photo">`;}else{av.textContent=(name||"O").slice(0,1).toUpperCase();}const mine=posts.filter(p=>(p.username||"").toLowerCase()===myUsername().toLowerCase());$("profilePostCount").textContent=mine.length;$("profileGrid").innerHTML=mine.map(p=>p.image_url?`<img src="${escapeHtml(p.image_url)}" alt="Post" loading="lazy">`:`<div style="aspect-ratio:1;background:var(--panel2);padding:8px;border-radius:9px;overflow:hidden">${escapeHtml(p.caption||"Post")}</div>`).join("");}
+function openCreate(kind="photo"){const titles={photo:"Create photo post",video:"Create video post",reel:"Create a Reel",story:"Create a Story",highlight:"Create Highlight"};openModal(titles[kind]||"Create",`<div class="menu-grid"><button data-kind="photo"><b>📸 Photo</b><span class="small muted">Share to feed</span></button><button data-kind="video"><b>🎥 Video</b><span class="small muted">Share a video</span></button><button data-kind="reel"><b>🎬 Reel</b><span class="small muted">Video post</span></button><button data-kind="story"><b>✨ Story</b><span class="small muted">24-hour style preview</span></button><button data-kind="highlight"><b>🌟 Highlights</b><span class="small muted">Profile collections</span></button></div><div id="createForm" style="margin-top:15px"></div>`);document.querySelectorAll("[data-kind]").forEach(b=>b.onclick=()=>showCreateForm(b.dataset.kind));showCreateForm(kind);}
+function showCreateForm(kind){selectedMediaUrl=null;selectedMediaType=kind==="video"||kind==="reel"?"video":"image";const form=$("createForm");if(!form)return;form.innerHTML=`<span class="pill">${kind.toUpperCase()}</span><label>Choose ${selectedMediaType==="video"?"video":"photo"} (optional for text posts)</label><input id="mediaFile" type="file" accept="${selectedMediaType==="video"?"video/*":"image/*"}"><div id="previewArea"></div><label>Caption / text</label><textarea id="captionInput" maxlength="2000" placeholder="Share something with your world…"></textarea>${kind==="story"?'<label>Story style</label><select id="storyStyle"><option>Neon future</option><option>Gradient glow</option><option>Minimal</option></select><p class="muted small">Story publishing needs a Stories table and storage policies; this editor preview is available, but publishing is not enabled yet.</p>':''}${kind==="highlight"?'<p class="muted small">Highlights need saved Stories first; publishing is not enabled in this version.</p>':''}<div class="modal-actions"><button id="publishBtn">${kind==="story"?"Preview story":kind==="highlight"?"Create highlight":"Share post"}</button><button id="cancelCreate" class="secondary">Cancel</button></div><div id="createStatus" class="status"></div>`;const fileInput=$("mediaFile");fileInput.onchange=()=>{const f=fileInput.files?.[0];if(!f)return;if(f.size>50*1024*1024){status("createStatus","File must be under 50 MB.",true);fileInput.value="";return;}selectedMediaType=f.type.startsWith("video/")?"video":"image";selectedMediaUrl=URL.createObjectURL(f);$("previewArea").innerHTML=selectedMediaType==="video"?`<video class="editor-preview" src="${selectedMediaUrl}" controls></video>`:`<img class="editor-preview" src="${selectedMediaUrl}" alt="Preview">`;};$("cancelCreate").onclick=closeModal;$("publishBtn").onclick=()=>publish(kind);}
+async function publish(kind){const caption=$("captionInput")?.value.trim()||"",file=$("mediaFile")?.files?.[0];if(kind==="story"){status("createStatus","Story preview only: Stories table/storage policy is not configured yet.",true);return;}if(kind==="highlight"){status("createStatus","Create a story first; Highlights backend is not configured yet.",true);return;}if(!caption&&!file)return status("createStatus","Add a caption or choose a file.",true);if(!currentUser)return status("createStatus","Please sign in again.",true);const btn=$("publishBtn");btn.disabled=true;status("createStatus","Publishing…");let image_url=null;if(file){const ext=(file.name.split(".").pop()||"bin").toLowerCase().replace(/[^a-z0-9]/g,"");const path=`${currentUser.id}/${Date.now()}.${ext}`;const {error:uploadError}=await db.storage.from("orbixa-posts").upload(path,file,{upsert:false,contentType:file.type});if(uploadError){btn.disabled=false;return status("createStatus","Upload failed: "+uploadError.message,true);}const {data}=db.storage.from("orbixa-posts").getPublicUrl(path);image_url=data.publicUrl;}
+const {error}=await db.from("Posts").insert({username:myUsername(),caption,image_url,likes_count:0});if(error){btn.disabled=false;return status("createStatus","Post failed: "+error.message,true);}closeModal();await loadPosts();showPage("homePage");}
+function openEditProfile(){const p=myProfile||{};openModal("Edit profile",`<label>Display name</label><input id="editDisplay" maxlength="50" value="${escapeHtml(p.display_name||"")}"><label>Username</label><input id="editUsername" maxlength="24" value="${escapeHtml(p.username||myUsername())}"><label>Bio</label><textarea id="editBio" maxlength="160">${escapeHtml(p.bio||"")}</textarea><label>Profile photo URL (optional)</label><input id="editAvatar" type="url" value="${escapeHtml(p.avatar_url||"")}" placeholder="https://…"><div class="modal-actions"><button id="saveProfile">Save profile</button><button id="cancelEdit" class="secondary">Cancel</button></div><div id="editStatus" class="status"></div>`);$("cancelEdit").onclick=closeModal;$("saveProfile").onclick=saveProfile;}
+async function saveProfile(){const username=$("editUsername").value.trim().replace(/^@/,""),display_name=$("editDisplay").value.trim(),bio=$("editBio").value.trim(),avatar_url=$("editAvatar").value.trim();if(!/^[a-zA-Z0-9_.]{3,24}$/.test(username))return status("editStatus","Username must be 3–24 characters (letters, numbers, _ or .).",true);status("editStatus","Saving…");const payload={id:currentUser.id,username,display_name,bio,avatar_url};const {error}=await db.from("profiles").upsert(payload,{onConflict:"id"});if(error)return status("editStatus","Profile save failed: "+error.message,true);myProfile=payload;await db.auth.updateUser({data:{username,display_name}});closeModal();renderProfile();toast("Profile saved.");}
+$("homeCreate").onclick=()=>openCreate();$("homeCreate2").onclick=()=>openCreate();$("profileCreate").onclick=()=>openCreate();$("editProfileBtn").onclick=openEditProfile;$("settingsEditProfile").onclick=openEditProfile;
+$("topAlerts").onclick=()=>showPage("alertsPage");$("profileAlerts").onclick=()=>showPage("alertsPage");$("settingsBtn").onclick=()=>showPage("settingsPage");$("settingsBack").onclick=()=>showPage("profilePage");
+$("newHighlight").onclick=()=>openCreate("highlight");$("logoutBtn").onclick=async()=>{const {error}=await db.auth.signOut();if(error)toast(error.message);};
+$("searchBtn").onclick=()=>{const q=$("searchInput").value.trim().toLowerCase();const found=posts.filter(p=>(p.username||"").toLowerCase().includes(q)||(p.caption||"").toLowerCase().includes(q));$("searchResults").innerHTML=found.length?found.map(postCard).join(""):'<div class="card muted">No matching posts found.</div>';};
+$("saveNote").onclick=()=>status("noteStatus",$("noteText").value.trim()?"Note preview saved on this screen only; it is not shared yet.":"Write a note first.",!$("noteText").value.trim());
+$("settingsPrivacy").onclick=()=>toast("Privacy controls need secure database policies and are not enabled yet.");$("settingsLanguage").onclick=()=>showPage("settingsPage");$("settingsNotifications").onclick=()=>toast("Notification preferences will work when notifications are connected.");$("settingsAppearance").onclick=()=>toast("Dark appearance is active. Light mode is planned.");$("settingsHelp").onclick=()=>toast("Help: use the app carefully and never share your password.");$("settingsAbout").onclick=()=>toast("Orbixa — Connect Your World. Version 1.0 preview.");$("saveLanguage").onclick=()=>{localStorage.setItem("orbixa-language",$("languageSelect").value);toast("Language preference saved on this device.");};$("settingsResetPassword").onclick=async()=>{if(!currentUser?.email)return toast("No email found for this account.");const {error}=await db.auth.resetPasswordForEmail(currentUser.email);toast(error?error.message:"Password reset email requested.");};
+const savedLang=localStorage.getItem("orbixa-language");if(savedLang)$("languageSelect").value=savedLang;
+})();
 </script>
 </body>
-  </html>
+</html>
+
